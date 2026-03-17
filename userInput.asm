@@ -19,7 +19,7 @@ _start:
   mov edi, buffer
   mov esi, 64
   call _in
-	lea rdi, out
+	mov rdi, out
 	mov rsi, app
 	mov rdx, appLen
 	mov rcx, buffer
