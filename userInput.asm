@@ -31,34 +31,33 @@ _start:
 	call _print
 	jmp _exit
 	
-_buffercpy: 
+_ccstr: ; rdi(b1), rsi(b2), rdx(b1len)
+  mov r9, rcx
+  mov r10, rcx
+  call _bcloop
+  ret
+  
+  
+	
+_buffercpy: ; concatenate two strings and put into a singular buffer
   ; params: rdi (writeBuffer), rsi (b1), rdx (b1len), rcx (b2), r8 (b2len)
   mov r9, 0   ; index of writeBuffer
   mov r10, 0  ; index for b1 loop
-  call _b1loop
-  call _b2loop
+  call _bcloop
+  mov rsi, rcx
+  mov rdx, r8
+  mov r10, 0
+  call _bcloop
   ret
 
-_b1loop:
-  cmp r10, rdx        ; compare index with b1 length
-  jge _b2setup        ; if done with b1, go to b2
-  mov al, [rsi+r10]   ; load byte from b1 into 8-bit register
+_bcloop:
+  cmp r10, rdx         ; compare index with b2 length
+  jge _ret            ; if done, exit
+  mov al, [rsi+r10]   ; load byte from b2 (buffer)
   mov [rdi+r9], al    ; store byte into writeBuffer
   inc r9
   inc r10
-  jmp _b1loop
-
-_b2setup:
-  mov r11, 0          ; index for b2 loop
-
-_b2loop:
-  cmp r11, r8         ; compare index with b2 length
-  jge _ret            ; if done, exit
-  mov al, [rcx+r11]   ; load byte from b2 (buffer)
-  mov [rdi+r9], al    ; store byte into writeBuffer
-  inc r9
-  inc r11
-  jmp _b2loop
+  jmp _bcloop
 
 _ret:
   ret
